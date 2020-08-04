@@ -7,7 +7,7 @@ class GeneticAlgorithm():
 
     """ Genetic Algorithm to solve the N-Queens Problem. """
 
-    def __init__(self, n, m, max_gen = 1000, mut_prob = 0.8, sample_size = 10):
+    def __init__(self, n, m, max_gen = 1000, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10):
 
         """
             n: Number of queens on the chessboard
@@ -15,6 +15,7 @@ class GeneticAlgorithm():
             n_gen: Number of generations
             max_gen: Maximum number of generations
             mut_prob: Mutation probability
+            cross_prob: Crossover probability
             sample_size: Sample size of parent selection
         """
 
@@ -23,6 +24,7 @@ class GeneticAlgorithm():
         self.n_gen = 0
         self.max_gen = max_gen
         self.mut_prob = mut_prob
+        self.cross_prob = cross_prob
         self.sample_size = sample_size
         self.best_solution = np.zeros((self.n,))
         self.best_fitness = float('Inf')
@@ -71,19 +73,27 @@ class GeneticAlgorithm():
             The reverse also happens to generate two children. """
         
         assert (len(parent_a) == len(parent_b)), "Parents with different lengths"
+
+        # Offspring
+        offspring_a = parent_a.copy()
+        offspring_b = parent_b.copy()
+
+        prob = float(np.random.uniform(low = 0, high = 1))
+
+        if prob < self.cross_prob:
       
-        # Selecting crossover point
-        point = int(np.random.randint(low = 1, high = self.n-1, size = 1))
-        
-        # First offspring
-        head = parent_a[:point]
-        tail = [i for i in parent_b if i not in head]
-        offspring_a = np.concatenate([head, tail], axis = 0)
-        
-        # Second offspring
-        head = parent_b[:point]
-        tail = [i for i in parent_a if i not in head]
-        offspring_b = np.concatenate([head, tail], axis = 0)
+            # Selecting crossover point
+            point = int(np.random.randint(low = 1, high = self.n-1, size = 1))
+            
+            # First offspring
+            head = parent_a[:point]
+            tail = [i for i in parent_b if i not in head]
+            offspring_a = np.concatenate([head, tail], axis = 0)
+            
+            # Second offspring
+            head = parent_b[:point]
+            tail = [i for i in parent_a if i not in head]
+            offspring_b = np.concatenate([head, tail], axis = 0)
         
         return offspring_a, offspring_b    
 
@@ -180,7 +190,7 @@ class GeneticAlgorithm():
 
 if __name__ == '__main__':
 
-    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 1000, mut_prob = 0.8, sample_size = 10)
+    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 1000, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10)
     GA.solve()
     print('Best solution:', GA.best_solution)
     print('Best fitness:', GA.best_fitness)
