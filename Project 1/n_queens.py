@@ -16,7 +16,7 @@ class GeneticAlgorithm():
             max_gen: Maximum number of generations
             mut_prob: Mutation probability
             cross_prob: Crossover probability
-            sample_size: Sample size of parent selection
+            sample_size: Sample size in parent selection
         """
 
         self.n = n
@@ -177,10 +177,12 @@ class GeneticAlgorithm():
             population = np.vstack([population, [offspring_a, offspring_b]])
             fitness = np.append(fitness, [fitness_a, fitness_b])
             
+            # Selects individuals for the next generation
+            population, fitness = self.survivor_selection(population, fitness)
+
             # Updates new best solution
             self.best_fitness = np.min(fitness)
-            best_idx = np.argmin(fitness)
-            self.best_solution = population[best_idx]
+            self.best_solution = population[np.argmin(fitness)]
             
             # Increases number of generations
             self.n_gen = self.n_gen + 1
@@ -190,7 +192,7 @@ class GeneticAlgorithm():
 
 if __name__ == '__main__':
 
-    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 1000, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10)
+    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 500, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10)
     GA.solve()
     print('Best solution:', GA.best_solution)
     print('Best fitness:', GA.best_fitness)
