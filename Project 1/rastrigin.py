@@ -2,6 +2,8 @@
 import numpy as np
 # pip install tqdm
 from tqdm import tqdm
+# pip install matplotlib
+import matplotlib.pyplot as plt
 
 class GeneticAlgorithm():
 
@@ -69,7 +71,7 @@ class GeneticAlgorithm():
 
         return X
 
-    def initial_population(self):
+    def random_initial_population(self):
     
         """ Random population initialization. """
         
@@ -78,7 +80,7 @@ class GeneticAlgorithm():
         fitness = np.zeros((self.m,))
             
         # Generating initial population
-        for i in range((self.m)):
+        for i in range(self.m):
             X = np.random.uniform(low = self.interval[0], high = self.interval[1], size = self.n)
             fitness[i] = self.rastrigin(X)
             B = self.encoding(X)
@@ -87,6 +89,44 @@ class GeneticAlgorithm():
         population = np.array(population).reshape((self.m,(self.n*self.l)))
         
         return population, fitness
+
+    def opposition_based_population(self):
+
+        """ Opposition-based population initialization. 
+            A novel population initialization method for accelerating evolutionary algorithms 
+            (https://www.sciencedirect.com/science/article/pii/S0898122107001344). """
+
+        # Empty population
+        population = list()
+        fitness = np.zeros((2*self.m,))
+            
+        # Generating initial population
+        i = 0
+        while i < 2*self.m:
+            
+            # Random population
+            X = np.random.uniform(low = self.interval[0], high = self.interval[1], size = self.n)
+            fitness[i] = self.rastrigin(X)
+            B = self.encoding(X)
+            population.append(B)
+
+            # Calculating opposite population
+            O = self.interval[0] + self.interval[1] - X
+            fitness[i+1] = self.rastrigin(O)
+            B = self.encoding(O)
+            population.append(B)
+
+            # Increases number of individuals
+            i += 2
+        
+        # Selects the m best individuals for initial population
+        best_idxs = np.argsort(fitness)[:self.m]
+        fitness = fitness[best_idxs]
+        population = np.array(population).reshape(((2*self.m),(self.n*self.l)))
+        population = population[best_idxs]
+
+        return population, fitness
+
 
     def rastrigin(self, X, A = 10):
     
@@ -216,8 +256,9 @@ class GeneticAlgorithm():
 
         """ Minimizes the Rastrigin function. """
 
-        # Initializes population with random candidate solutions
-        population, fitness = self.initial_population()
+        # Initializes population with opposition-based candidate solutions
+        population, fitness = self.opposition_based_population()
+        # population, fitness = self.random_initial_population()
 
         # Progress bar
         pbar = tqdm(total = self.max_eval, desc = 'Generations')
@@ -232,7 +273,9 @@ class GeneticAlgorithm():
                 parent_a, parent_b = self.roulette_wheel(population, fitness)
             else:
                 parent_a, parent_b = self.tournament_selection(population, fitness)
-            
+
+            # lmbda = int(np.round(self.m/2)) if np.round(self.m/2) % 2 == 0 else int(np.round(self.m/2) + 1)
+
             # Recombines pairs of parents
             offspring_a, offspring_b = self.variable_length_crossover(parent_a, parent_b)
 
@@ -242,15 +285,15 @@ class GeneticAlgorithm():
 
             # Evaluates new candidates
             fitness_a = self.rastrigin(self.decoding(offspring_a))
-            fitness_b = self.rastrigin(self.decoding(offspring_b))            
+            fitness_b = self.rastrigin(self.decoding(offspring_b))    
+
+            # Adds new individuals to the population
+            population = np.vstack([population, [offspring_a, offspring_b]])
+            fitness = np.append(fitness, [fitness_a, fitness_b])        
             
             # Increases number of function evaluations
             self.n_eval = self.n_eval + 2
             pbar.update(2)
-
-            # Adds new individuals to the population
-            population = np.vstack([population, [offspring_a, offspring_b]])
-            fitness = np.append(fitness, [fitness_a, fitness_b])
 
             # Selects individuals for the next generation
             population, fitness = self.survivor_selection(population, fitness)
@@ -259,11 +302,15 @@ class GeneticAlgorithm():
             self.best_fitness = np.min(fitness)
             self.best_solution = population[np.argmin(fitness)]
 
+            if self.n_eval % 100 == 0:
+                plt.scatter(self.n_eval, self.best_fitness, c = 'black', s = 1)
+                plt.pause(0.00001)
+
         pbar.close()
 
 if __name__ == '__main__':
 
-    GA = GeneticAlgorithm(n = 10, m = 10, l = 20, max_eval = 10000, mut_prob = 0.9, cross_prob = 0.9, k = 5)
+    GA = GeneticAlgorithm(n = 10, m = 20, l = 20, max_eval = 10000, mut_prob = 0.025, cross_prob = 0.75, k = 20)
     GA.solve()
     print('Best solution:', GA.best_solution)
     print('Best solution:', GA.decoding(GA.best_solution))

@@ -7,7 +7,7 @@ class GeneticAlgorithm():
 
     """ Genetic Algorithm to solve the N-Queens Problem. """
 
-    def __init__(self, n, m, max_gen = 1000, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10):
+    def __init__(self, n, m, max_gen = 1000, mut_prob = 0.8, cross_prob = 0.8, k = 10):
 
         """
             n: Number of queens on the chessboard
@@ -16,7 +16,7 @@ class GeneticAlgorithm():
             max_gen: Maximum number of generations
             mut_prob: Mutation probability
             cross_prob: Crossover probability
-            sample_size: Sample size in parent selection
+            k: Sample size in parent selection
         """
 
         self.n = n
@@ -25,7 +25,7 @@ class GeneticAlgorithm():
         self.max_gen = max_gen
         self.mut_prob = mut_prob
         self.cross_prob = cross_prob
-        self.sample_size = sample_size
+        self.k = k
         self.best_solution = np.zeros((self.n,))
         self.best_fitness = float('Inf')
 
@@ -66,7 +66,7 @@ class GeneticAlgorithm():
         
         return fitness
 
-    def single_point_crossover(self, parent_a, parent_b):
+    def cut_and_crossfill_crossover(self, parent_a, parent_b):
         
         """ One crossover point is selected, till this point the permutation is copied from the first parent, 
             then the second parent is scanned and if the number is not yet in the offspring it is added.
@@ -117,12 +117,12 @@ class GeneticAlgorithm():
         return offspring        
 
 
-    def parent_selection(self, population, fitness, sample_size = 10):
+    def parent_selection(self, population, fitness, k = 10):
         
         """ Selects two parents from a sample of the population. """
 
         # Candidate solutions
-        idxs = np.random.choice(range(self.m), size = self.sample_size, replace = False)
+        idxs = np.random.choice(range(self.m), size = self.k, replace = False)
         candidate_solutions = population[idxs]
         candidate_fitness = fitness[idxs]        
         
@@ -163,7 +163,7 @@ class GeneticAlgorithm():
             parent_a, parent_b = self.parent_selection(population, fitness)
 
             # Recombines pairs of parents
-            offspring_a, offspring_b = self.single_point_crossover(parent_a, parent_b)
+            offspring_a, offspring_b = self.cut_and_crossfill_crossover(parent_a, parent_b)
 
             # Mutates the resulting offspring
             offspring_a = self.mutation(offspring_a)
@@ -192,7 +192,7 @@ class GeneticAlgorithm():
 
 if __name__ == '__main__':
 
-    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 500, mut_prob = 0.8, cross_prob = 0.8, sample_size = 10)
+    GA = GeneticAlgorithm(n = 8, m = 100, max_gen = 500, mut_prob = 0.8, cross_prob = 0.8, k = 10)
     GA.solve()
     print('Best solution:', GA.best_solution)
     print('Best fitness:', GA.best_fitness)
