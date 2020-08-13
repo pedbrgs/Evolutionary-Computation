@@ -136,9 +136,9 @@ class GeneticAlgorithm():
         
         return Y
 
-    def variable_length_crossover(self, parent_a, parent_b):
+    def variable_to_variable(self, parent_a, parent_b):
         
-        """ One crossover per variable. """
+        """ One point per variable crossover. """
         
         assert (len(parent_a) == len(parent_b)), "Parents with different lengths"
 
@@ -277,7 +277,7 @@ class GeneticAlgorithm():
             # lmbda = int(np.round(self.m/2)) if np.round(self.m/2) % 2 == 0 else int(np.round(self.m/2) + 1)
 
             # Recombines pairs of parents
-            offspring_a, offspring_b = self.variable_length_crossover(parent_a, parent_b)
+            offspring_a, offspring_b = self.variable_to_variable(parent_a, parent_b)
 
             # Mutates the resulting offspring
             offspring_a = self.mutation(offspring_a)
@@ -302,9 +302,9 @@ class GeneticAlgorithm():
             self.best_fitness = np.min(fitness)
             self.best_solution = population[np.argmin(fitness)]
 
-            if self.n_eval % 100 == 0:
-                plt.scatter(self.n_eval, self.best_fitness, c = 'black', s = 1)
-                plt.pause(0.00001)
+            # if self.n_eval % 100 == 0:
+            #     plt.scatter(self.n_eval, self.best_fitness, c = 'black', s = 1)
+            #     plt.pause(0.00001)
 
         pbar.close()
 
