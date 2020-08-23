@@ -261,7 +261,7 @@ class GeneticAlgorithm():
         # population, fitness = self.random_initial_population()
 
         # Progress bar
-        pbar = tqdm(total = self.max_eval, desc = 'Generations')
+        pbar = tqdm(total = self.max_eval, desc = 'Function evaluations')
 
         # Until the maximum number of function evaluations is reached or the global optimal solution is found
         while self.best_fitness > 0 and self.n_eval < self.max_eval:
