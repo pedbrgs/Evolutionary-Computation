@@ -2,8 +2,6 @@
 import numpy as np
 # pip install tqdm
 from tqdm import tqdm
-# pip install matplotlib
-import matplotlib.pyplot as plt
 
 class GeneticAlgorithm():
 
@@ -274,8 +272,6 @@ class GeneticAlgorithm():
             else:
                 parent_a, parent_b = self.tournament_selection(population, fitness)
 
-            # lmbda = int(np.round(self.m/2)) if np.round(self.m/2) % 2 == 0 else int(np.round(self.m/2) + 1)
-
             # Recombines pairs of parents
             offspring_a, offspring_b = self.variable_to_variable(parent_a, parent_b)
 
@@ -301,10 +297,6 @@ class GeneticAlgorithm():
             # Updates new best solution
             self.best_fitness = np.min(fitness)
             self.best_solution = population[np.argmin(fitness)]
-
-            # if self.n_eval % 100 == 0:
-            #     plt.scatter(self.n_eval, self.best_fitness, c = 'black', s = 1)
-            #     plt.pause(0.00001)
 
         pbar.close()
 
