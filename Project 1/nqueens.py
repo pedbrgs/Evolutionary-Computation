@@ -117,7 +117,7 @@ class GeneticAlgorithm():
         return offspring        
 
 
-    def parent_selection(self, population, fitness, k = 10):
+    def parent_selection(self, population, fitness):
         
         """ Selects two parents from a sample of the population. """
 
