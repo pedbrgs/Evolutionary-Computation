@@ -8,11 +8,12 @@ class Optimizer():
 
     """ Genetic algorithm to optimize hyperparameters of the Tiny-YOLO object detector """
 
-    def __init__(self, m, k, max_gen, n = 4, mut_prob = 0.25, cross_prob = 0.8):
+    def __init__(self, m, k, max_gen, resume = False, n = 4, mut_prob = 0.25, cross_prob = 0.8):
 
         """
             m: Number of individuals in the population
             k: Sample size in parent selection
+            resume: Resume optimization from a known population (backup.npy)
             max_gen: Maximum number of generations
             n: Number of hyperparameters
             mut_prob: Mutation probability
@@ -22,6 +23,7 @@ class Optimizer():
         self.m = m
         self.n = n
         self.k = k
+        self.resume = resume
         self.best_fitness = 0
         self.max_gen = max_gen
         self.mut_prob = mut_prob
@@ -32,7 +34,7 @@ class Optimizer():
 
         # Running evaluation algorithm and saving to temporary file
         f = open("temp.txt", "w+")
-        subprocess.call('./darknet detector map dfire.data dfire.cfg weights/dfire_final.weights', shell = True, stdout = f)
+        subprocess.call('./darknet detector map dfire.data dfire.cfg weights/dfire_best.weights', shell = True, stdout = f)
 
         # Reading temporary file to extract map metric
         f.seek(0,0)
@@ -199,7 +201,14 @@ class Optimizer():
     def evolve(self):
 
         # Initializes population with random hyperparameters
-        population, fitness = self.random_initial_population()
+        if self.resume is False:
+            population, fitness = self.random_initial_population()
+        # Load population and fitness from backup
+        else:
+            with open('backup.npy', 'rb') as f:
+                population = np.load(f)
+                fitness = np.load(f)
+            f.close()
 
         # Log
         log = open("log.txt", "w+")
@@ -261,6 +270,12 @@ class Optimizer():
             # Increases number of generations
             pbar.update(1)       
 
+        with open('backup.npy', 'wb') as f:
+            np.save(f, population)
+            np.save(f, fitness)
+
+        # Closing log, backup and progress bar
+        f.close()
         log.close()
         pbar.close()
 
