@@ -108,10 +108,6 @@ class Optimizer():
 
         population = np.array(population)
 
-        # Saving the best solution
-        self.best_hyperparams = population[np.argmax(fitness)]
-        self.best_fitness = np.max(fitness)
-
         return population, fitness
 
     def crossover(self, parent_a, parent_b):
@@ -200,19 +196,26 @@ class Optimizer():
 
     def evolve(self):
 
-        # Initializes population with random hyperparameters
         if self.resume is False:
+            # Initializes population with random hyperparameters
             population, fitness = self.random_initial_population()
-        # Load population and fitness from backup
+            # New log
+            log = open("log.txt", "w+")
+            # Header
+            log.write('momentum,decay,learning_rate,ignore_thresh,mAP\n')
+  
         else:
+            # Load population and fitness from backup
             with open('backup.npy', 'rb') as f:
                 population = np.load(f)
                 fitness = np.load(f)
             f.close()
+            # Log that already exists
+            log = open("log.txt", "a+")
 
-        # Log
-        log = open("log.txt", "w+")
-        log.write('momentum,decay,learning_rate,ignore_thresh,mAP\n')
+        # Saving the best solution
+        self.best_hyperparams = population[np.argmax(fitness)]
+        self.best_fitness = np.max(fitness)
 
         # Logging best hyperparameters and best fitness
         log.write(str(np.round(self.best_hyperparams[0], 6)) + ',' + 
