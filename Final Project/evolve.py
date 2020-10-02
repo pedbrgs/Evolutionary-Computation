@@ -224,6 +224,9 @@ class Optimizer():
                   str(np.round(self.best_hyperparams[3], 6)) + ',' + 
                   str(self.best_fitness) + '\n')
 
+        # Closing log
+        log.close()
+
         # Progress bar
         pbar = tqdm(total = self.max_gen, desc = 'Generations')
 
@@ -263,12 +266,18 @@ class Optimizer():
             self.best_hyperparams = population[np.argmax(fitness)]
             self.best_fitness = np.max(fitness)
 
+            # Opening log
+            log = open("log.txt", "a+")
+
             # Logging best hyperparameters and best fitness
             log.write(str(np.round(self.best_hyperparams[0], 6)) + ',' + 
                       str(np.round(self.best_hyperparams[1], 8)) + ',' + 
                       str(np.round(self.best_hyperparams[2], 8)) + ',' + 
                       str(np.round(self.best_hyperparams[3], 6)) + ',' + 
                       str(self.best_fitness) + '\n')
+
+            # Closing log
+            log.close()
 
             # Increases number of generations
             pbar.update(1)       
@@ -277,14 +286,13 @@ class Optimizer():
             np.save(f, population)
             np.save(f, fitness)
 
-        # Closing log, backup and progress bar
+        # Closing backup and progress bar
         f.close()
-        log.close()
         pbar.close()
 
 if __name__ == '__main__':
 
-    optimizer = Optimizer(m = 3, k = 3, max_gen = 2, mut_prob = 0.25, cross_prob = 0.8)
+    optimizer = Optimizer(m = 3, k = 3, max_gen = 20, mut_prob = 0.25, cross_prob = 0.8)
     optimizer.evolve()
     print('Best hyperparameters:', optimizer.best_hyperparams)
     print('Best fitness:', optimizer.best_fitness)
