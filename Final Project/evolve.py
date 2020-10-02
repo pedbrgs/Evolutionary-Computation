@@ -199,9 +199,9 @@ class Optimizer():
         if self.resume is False:
             # Initializes population with random hyperparameters
             population, fitness = self.random_initial_population()
-            # New log
+            # Creating a new log
             log = open("log.txt", "w+")
-            # Header
+            # Writing header
             log.write('momentum,decay,learning_rate,ignore_thresh,mAP\n')
   
         else:
