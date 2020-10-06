@@ -218,7 +218,8 @@ class Optimizer():
         self.best_fitness = np.max(fitness)
 
         # Logging best hyperparameters and best fitness
-        log.write(str(np.round(self.best_hyperparams[0], 6)) + ',' + 
+        log.write(str(0) + ',' +
+                  str(np.round(self.best_hyperparams[0], 6)) + ',' + 
                   str(np.round(self.best_hyperparams[1], 8)) + ',' + 
                   str(np.round(self.best_hyperparams[2], 8)) + ',' + 
                   str(np.round(self.best_hyperparams[3], 6)) + ',' + 
