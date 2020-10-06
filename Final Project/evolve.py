@@ -202,7 +202,7 @@ class Optimizer():
             # Creating a new log
             log = open("log.txt", "w+")
             # Writing header
-            log.write('momentum,decay,learning_rate,ignore_thresh,mAP\n')
+            log.write('generation,momentum,decay,learning_rate,ignore_thresh,mAP\n')
   
         else:
             # Load population and fitness from backup
@@ -270,7 +270,8 @@ class Optimizer():
             log = open("log.txt", "a+")
 
             # Logging best hyperparameters and best fitness
-            log.write(str(np.round(self.best_hyperparams[0], 6)) + ',' + 
+            log.write(str(n_gen) + ',' +
+                      str(np.round(self.best_hyperparams[0], 6)) + ',' + 
                       str(np.round(self.best_hyperparams[1], 8)) + ',' + 
                       str(np.round(self.best_hyperparams[2], 8)) + ',' + 
                       str(np.round(self.best_hyperparams[3], 6)) + ',' + 
@@ -280,7 +281,7 @@ class Optimizer():
             log.close()
 
             # Increases number of generations
-            pbar.update(1)       
+            pbar.update(1)     
 
         with open('backup.npy', 'wb') as f:
             np.save(f, population)
@@ -292,7 +293,7 @@ class Optimizer():
 
 if __name__ == '__main__':
 
-    optimizer = Optimizer(m = 3, k = 3, max_gen = 20, mut_prob = 0.25, cross_prob = 0.8)
+    optimizer = Optimizer(m = 20, k = 20, max_gen = 20, mut_prob = 0.25, cross_prob = 0.8)
     optimizer.evolve()
     print('Best hyperparameters:', optimizer.best_hyperparams)
     print('Best fitness:', optimizer.best_fitness)
